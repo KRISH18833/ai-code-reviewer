@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Code Reviewer
 
-## Getting Started
+Paste your code, pick a language, and get a structured AI-powered review streamed directly to your browser.
 
-First, run the development server:
+## Features
+
+- **Streaming review** — results appear word-by-word as the model responds
+- **5 structured sections** — Summary, Bugs, Security, Style & Readability, Improved Code
+- **Input validation** — rejects empty input and enforces an 8 000-character limit
+- **Loading & error states** — spinner during generation, clear error messages on failure
+- **Stop button** — cancel mid-stream at any time
+- **Model fallback chain** — automatically retries with the next model if one is unavailable or quota-exceeded
+- **API key stays server-side** — the Gemini key is never exposed to the browser
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| AI SDK | Vercel AI SDK (`ai` + `@ai-sdk/google`) |
+| AI Model | Google Gemini (via Gemini API) |
+| Hosting | Vercel |
+
+## How It Works
+
+1. The browser POSTs `{ code, language }` to `/api/review`
+2. The server validates the input, then calls the Gemini API via the Vercel AI SDK
+3. The model's response is streamed back as plain-text Markdown
+4. The client renders sections live using `react-markdown`
+
+If the primary model is unavailable, the server automatically falls through the configured model chain before returning an error.
+
+## Local Setup
 
 ```bash
+# 1. Clone the repo
+git clone <repo-url>
+cd ai-code-reviewer
+
+# 2. Install dependencies
+npm install
+
+# 3. Configure environment variables
+cp .env.example .env.local
+# Open .env.local and replace the placeholder with your real key
+# Get a free key at https://aistudio.google.com/apikey
+
+# 4. Start the dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Purpose |
+|---|---|
+| `GOOGLE_GENERATIVE_AI_API_KEY` | Gemini API key (required) |
+| `GEMINI_MODELS` | Comma-separated model fallback chain (optional; defaults to `gemini-3.8-flash,gemini-3.5-flash`) |
 
-## Learn More
+## Deploy to Vercel
 
-To learn more about Next.js, take a look at the following resources:
+1. Push this repo to GitHub (or GitLab / Bitbucket)
+2. Import the repo at [vercel.com/new](https://vercel.com/new)
+3. Add the environment variables from the table above in the Vercel dashboard
+4. Click **Deploy** — Vercel picks up `next build --webpack` automatically from `package.json`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Live Demo
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Live URL: *(add after deploy)*
